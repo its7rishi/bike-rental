@@ -110,7 +110,7 @@ RETURN_MENU() {
     MAIN_MENU "I could not find a record for that phone number."
   else
     # get customer's rentals
-    CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone = '$PHONE_NUMBER' AND return_date IS NULL ORDER BY bike_id")
+    CUSTOMER_RENTALS=$($PSQL "SELECT bike_id, type, size FROM bikes INNER JOIN rentals USING(bike_id) INNER JOIN customers USING(customer_id) WHERE phone = '$PHONE_NUMBER' AND date_returned IS NULL ORDER BY bike_id")
 
     # if no rentals
     if [[ -z $CUSTOMER_RENTALS  ]]
@@ -138,7 +138,7 @@ RETURN_MENU() {
       else 
        # check if input is rented
         RENTAL_ID=$($PSQL "SELECT rental_id FROM rentals INNER JOIN customers USING(customer_id) WHERE 
-        phone = '$PHONE_NUMBER' AND bike_id = $BIKE_ID_TO_RETURN AND return_date IS NULL")
+        phone = '$PHONE_NUMBER' AND bike_id = $BIKE_ID_TO_RETURN AND date_returned IS NULL")
        # if input not rented
         if [[ -z $RENTAL_ID ]] 
         then
@@ -147,7 +147,7 @@ RETURN_MENU() {
 
           else 
           # update return_date
-          RETURN_BIKE_RESULT=$($PSQL "UPDATE rentals SET return_date = NOW() WHERE rental_id = $RENTAL_ID")
+          RETURN_BIKE_RESULT=$($PSQL "UPDATE rentals SET date_returned = NOW() WHERE rental_id = $RENTAL_ID")
           # set bike availability to true
           SET_TO_TRUE_RESULT=$($PSQL "UPDATE bikes SET available = true WHERE bike_id = $BIKE_ID_TO_RETURN")
           # send to main menu
